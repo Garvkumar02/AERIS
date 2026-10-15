@@ -521,6 +521,9 @@ const getInitialApiBase = (): string => {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('aeris_api_base');
     if (stored !== null && stored.trim() !== '') return stored.trim().replace(/\/+$/, '');
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return 'https://aeris-l2o5.onrender.com';
+    }
   }
   return '';
 };
