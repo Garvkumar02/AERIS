@@ -3376,6 +3376,27 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => {
+                          const renderUrl = 'https://aeris-l2o5.onrender.com';
+                          setServerUrl(renderUrl);
+                          setApiBaseUrl(renderUrl);
+                          window.location.reload();
+                        }}
+                        style={{
+                          backgroundColor: '#6366F1',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ☁️ Render Cloud
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
                           const tunnel = 'https://zubxv3c-anonymous-8081.exp.direct';
                           setServerUrl(tunnel);
                           setApiBaseUrl(tunnel);

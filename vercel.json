@@ -6,35 +6,35 @@
   "rewrites": [
     {
       "source": "/auth/:path*",
-      "destination": "https://zubxv3c-anonymous-8081.exp.direct/auth/:path*"
+      "destination": "https://aeris-l2o5.onrender.com/auth/:path*"
     },
     {
       "source": "/attendance/:path*",
-      "destination": "https://zubxv3c-anonymous-8081.exp.direct/attendance/:path*"
+      "destination": "https://aeris-l2o5.onrender.com/attendance/:path*"
     },
     {
       "source": "/biometric/:path*",
-      "destination": "https://zubxv3c-anonymous-8081.exp.direct/biometric/:path*"
+      "destination": "https://aeris-l2o5.onrender.com/biometric/:path*"
     },
     {
       "source": "/devices/:path*",
-      "destination": "https://zubxv3c-anonymous-8081.exp.direct/devices/:path*"
+      "destination": "https://aeris-l2o5.onrender.com/devices/:path*"
     },
     {
       "source": "/admin/:path*",
-      "destination": "https://zubxv3c-anonymous-8081.exp.direct/admin/:path*"
+      "destination": "https://aeris-l2o5.onrender.com/admin/:path*"
     },
     {
       "source": "/registry/:path*",
-      "destination": "https://zubxv3c-anonymous-8081.exp.direct/registry/:path*"
+      "destination": "https://aeris-l2o5.onrender.com/registry/:path*"
     },
     {
       "source": "/gate/:path*",
-      "destination": "https://zubxv3c-anonymous-8081.exp.direct/gate/:path*"
+      "destination": "https://aeris-l2o5.onrender.com/gate/:path*"
     },
     {
       "source": "/health",
-      "destination": "https://zubxv3c-anonymous-8081.exp.direct/health"
+      "destination": "https://aeris-l2o5.onrender.com/health"
     },
     {
       "source": "/admin-portal/assets/:path*",
