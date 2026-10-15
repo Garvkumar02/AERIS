@@ -2,7 +2,8 @@ import os
 import time
 import uuid
 from datetime import datetime, timedelta, date
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, Response, Request, HTTPException, status
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -51,13 +52,18 @@ app.include_router(presence.router)
 app.include_router(notifications.router)
 app.include_router(privacy.router)
 
-
-import os
 from fastapi.staticfiles import StaticFiles
 
-_dist_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "dashboard", "dist"))
-if os.path.isdir(_dist_dir):
-    app.mount("/admin-portal", StaticFiles(directory=_dist_dir, html=True), name="admin-portal")
+_static_dir = os.path.join(os.path.dirname(__file__), "static")
+if not os.path.isdir(_static_dir):
+    _static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "dashboard", "dist"))
+
+if os.path.isdir(_static_dir):
+    _assets_dir = os.path.join(_static_dir, "assets")
+    if os.path.isdir(_assets_dir):
+        app.mount("/admin-portal/assets", StaticFiles(directory=_assets_dir), name="portal-assets")
+        app.mount("/assets", StaticFiles(directory=_assets_dir), name="root-assets")
+    app.mount("/admin-portal", StaticFiles(directory=_static_dir, html=True), name="admin-portal")
 
 @app.on_event("startup")
 def on_startup():
@@ -520,14 +526,36 @@ def on_startup():
     finally:
         db.close()
 
-@app.get("/")
-def root():
+@app.get("/", include_in_schema=False)
+def serve_root():
+    index_file = os.path.join(_static_dir, "index.html")
+    if os.path.isfile(index_file):
+        return FileResponse(index_file)
     return {
         "project": settings.PROJECT_NAME,
         "status": "online",
         "docs": "/docs",
         "version": "1.0.0"
     }
+
+@app.get("/api/status", tags=["system"])
+def api_status():
+    return {
+        "project": settings.PROJECT_NAME,
+        "status": "online",
+        "docs": "/docs",
+        "version": "1.0.0"
+    }
+
+@app.get("/{filename}.jpg", include_in_schema=False)
+@app.get("/{filename}.svg", include_in_schema=False)
+@app.get("/{filename}.png", include_in_schema=False)
+def serve_root_images(filename: str, request: Request):
+    name = request.url.path.lstrip("/")
+    target = os.path.join(_static_dir, name)
+    if os.path.isfile(target):
+        return FileResponse(target)
+    raise HTTPException(status_code=404, detail="Asset not found")
 
 @app.get("/health")
 def health():

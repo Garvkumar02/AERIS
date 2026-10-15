@@ -1,0 +1,9 @@
+/auth/*        https://aeris-l2o5.onrender.com/auth/:splat        200!
+/attendance/*  https://aeris-l2o5.onrender.com/attendance/:splat  200!
+/biometric/*   https://aeris-l2o5.onrender.com/biometric/:splat   200!
+/devices/*     https://aeris-l2o5.onrender.com/devices/:splat     200!
+/admin/*       https://aeris-l2o5.onrender.com/admin/:splat       200!
+/registry/*    https://aeris-l2o5.onrender.com/registry/:splat    200!
+/gate/*        https://aeris-l2o5.onrender.com/gate/:splat        200!
+/health        https://aeris-l2o5.onrender.com/health             200!
+/*             /index.html                                        200
