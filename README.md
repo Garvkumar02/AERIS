@@ -86,10 +86,6 @@ AERIS/
 
 AERIS is designed with biometric privacy, secure authentication, auditability, and data minimization in mind. Security controls and deletion workflows must be validated against the deployed implementation and applicable institutional policies.
 
-## 🌐 Live Dashboard
-
-[Open AERIS Admin Dashboard](https://dashboard-six-theta.vercel.app)
-
 ## 🧪 Testing & Validation
 
 The project includes phase-wise testing for authentication, attendance verification, gate access, privacy controls, notifications, reports, and audit integrity. Refer to the test scripts and documentation for actual results and known limitations.
