@@ -1,33 +1,15 @@
-# ==============================================================================
-# AERIS Dashboard - Production Multi-Stage Dockerfile
-# ==============================================================================
-
-# Stage 1: Build React/Vite SPA
-FROM node:22-alpine AS builder
-
+# Stage 1: Build static assets with Node.js
+FROM node:20-alpine AS builder
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm ci
-
+RUN npm install
 COPY . .
 RUN npm run build
 
-# Stage 2: Minimal Production Web Server
-FROM nginx:alpine-slim AS runtime
-
-# Remove default nginx static assets
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy compiled SPA bundle from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Custom Nginx configuration for SPA client routing and security headers
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
-
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-    CMD wget -qO- http://localhost/ || exit 1
-
-CMD ["nginx", "-g", "daemon off;"]
+# Stage 2: Serve static assets with lightweight webserver
+FROM node:20-alpine AS runner
+WORKDIR /app
+RUN npm install -g serve
+COPY --from=builder /app/dist ./dist
+EXPOSE 3000
+CMD ["sh", "-c", "serve -s dist -l ${PORT:-3000}"]
