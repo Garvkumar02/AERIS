@@ -4,6 +4,8 @@
 
 AERIS is an intelligent campus attendance and monitoring system designed to make student attendance more secure, efficient, and transparent. It combines AI-based facial verification, rotating QR codes, GPS geofencing, role-based access control, and cryptographic audit logs to reduce proxy attendance and improve campus management.
 
+deployed link : https://aeris-l2o5.onrender.com/
+
 ## ✨ Key Features
 
 ### 🤖 1. AI-Powered Face Recognition
