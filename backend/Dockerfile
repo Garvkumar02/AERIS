@@ -55,11 +55,11 @@ ENV PYTHONUNBUFFERED=1 \
     DATABASE_URL="sqlite:////app/data/aeris.db"
 
 # Expose internal service port
-EXPOSE 8000
+EXPOSE 8000 10000
 
 # Container healthcheck using liveness probe
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8000/health/live || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/health/live || exit 1
 
-# Start Uvicorn ASGI server with production workers
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--proxy-headers", "--forwarded-allow-ips", "*"]
+# Start Uvicorn ASGI server with single worker for Render 512MB free tier
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --proxy-headers --forwarded-allow-ips '*'"]

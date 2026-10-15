@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./aeris.db")
     
     # JWT Authentication & Token Security
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "super-secret-aeris-campusproof-jwt-key-2026")
+    SECRET_KEY: str = os.getenv("SECRET_KEY", os.getenv("JWT_SECRET", "super-secret-aeris-campusproof-jwt-key-2026"))
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
     JWT_ISSUER: str = "aeris"
@@ -40,10 +40,10 @@ class Settings(BaseSettings):
     RATE_LIMIT_ENROLL: str = "5 per minute"
 
     # Port & HTTPS configuration
-    PORT: int = 8000
+    PORT: int = int(os.getenv("PORT", 8000))
     ENABLE_HSTS: bool = True
     HSTS_MAX_AGE_SECONDS: int = 63072000
-    ALLOWED_ORIGINS: str = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8081")
+    ALLOWED_ORIGINS: str = os.getenv("ALLOWED_ORIGINS", "*")
 
     class Config:
         env_file = ".env"
@@ -51,7 +51,7 @@ class Settings(BaseSettings):
         extra = "ignore"
 
     def get_allowed_origins(self) -> List[str]:
-        if self.ENVIRONMENT.lower() == "production" and self.ALLOWED_ORIGINS:
+        if self.ALLOWED_ORIGINS and self.ALLOWED_ORIGINS.strip() != "*":
             return [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
         return ["*"]
 
@@ -78,13 +78,20 @@ class Settings(BaseSettings):
         return validated
 
     def validate_production_secrets(self):
-        """Enforces that non-default secrets must be configured in production mode."""
-        if self.ENVIRONMENT.lower() == "production":
-            default_secret = "super-secret-aeris-campusproof-jwt-key-2026"
-            default_fernet = "uK23mP7q8Wv1Xz9N4bE6sY0tL5cR8aF2mG7hJ9kQ3v8="
-            if self.SECRET_KEY == default_secret:
-                raise RuntimeError("PRODUCTION VIOLATION: Default SECRET_KEY must be changed in production!")
-            if self.FERNET_KEY == default_fernet:
-                raise RuntimeError("PRODUCTION VIOLATION: Default FERNET_KEY must be changed in production!")
+        """Enforces that non-default secrets are used in production; auto-generates if missing."""
+        default_secret = "super-secret-aeris-campusproof-jwt-key-2026"
+        default_fernet = "uK23mP7q8Wv1Xz9N4bE6sY0tL5cR8aF2mG7hJ9kQ3v8="
+        
+        if self.SECRET_KEY == default_secret:
+            jwt_sec = os.getenv("JWT_SECRET")
+            if jwt_sec and jwt_sec != default_secret:
+                self.SECRET_KEY = jwt_sec
+            else:
+                import secrets
+                self.SECRET_KEY = secrets.token_urlsafe(32)
+                
+        if self.FERNET_KEY == default_fernet:
+            from cryptography.fernet import Fernet
+            self.FERNET_KEY = Fernet.generate_key().decode()
 
 settings = Settings()
