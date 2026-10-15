@@ -37,7 +37,7 @@ services:
     plan: free
     rootDir: dashboard
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    publishDir: dist
     routes:
       - type: rewrite
         source: /admin-portal/assets/*
@@ -48,6 +48,12 @@ services:
       - type: rewrite
         source: /admin-portal/campus_floor_3d.jpg
         destination: /campus_floor_3d.jpg
+      - type: rewrite
+        source: /admin-portal/favicon.svg
+        destination: /favicon.svg
+      - type: rewrite
+        source: /admin-portal/icons.svg
+        destination: /icons.svg
       - type: rewrite
         source: /admin-portal/*
         destination: /index.html
