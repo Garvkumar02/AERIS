@@ -1,0 +1,60 @@
+[build]
+  base = "dashboard"
+  publish = "dist"
+  command = "npm install && npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/auth/*"
+  to = "https://aeris-l2o5.onrender.com/auth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/attendance/*"
+  to = "https://aeris-l2o5.onrender.com/attendance/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/biometric/*"
+  to = "https://aeris-l2o5.onrender.com/biometric/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/devices/*"
+  to = "https://aeris-l2o5.onrender.com/devices/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/admin/*"
+  to = "https://aeris-l2o5.onrender.com/admin/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/registry/*"
+  to = "https://aeris-l2o5.onrender.com/registry/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/gate/*"
+  to = "https://aeris-l2o5.onrender.com/gate/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/health"
+  to = "https://aeris-l2o5.onrender.com/health"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
