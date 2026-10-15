@@ -517,7 +517,26 @@ interface MerkleVerifyItem {
   message: string;
 }
 
-const API_BASE = '';
+const getInitialApiBase = (): string => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('aeris_api_base');
+    if (stored !== null && stored.trim() !== '') return stored.trim().replace(/\/+$/, '');
+  }
+  return '';
+};
+
+let API_BASE = getInitialApiBase();
+
+export const setApiBaseUrl = (url: string) => {
+  API_BASE = url.trim().replace(/\/+$/, '');
+  if (typeof window !== 'undefined') {
+    if (API_BASE) {
+      localStorage.setItem('aeris_api_base', API_BASE);
+    } else {
+      localStorage.removeItem('aeris_api_base');
+    }
+  }
+};
 
 export default function App() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('aeris_admin_token'));
@@ -527,6 +546,8 @@ export default function App() {
   const [userDesignation, setUserDesignation] = useState<string>(() => localStorage.getItem('aeris_user_designation') || '');
   const [userEmpId, setUserEmpId] = useState<string>(() => localStorage.getItem('aeris_user_empid') || '');
   const [userId, setUserId] = useState<string>(() => localStorage.getItem('aeris_user_id') || '');
+  const [serverUrl, setServerUrl] = useState<string>(() => localStorage.getItem('aeris_api_base') || '');
+  const [showServerConfig, setShowServerConfig] = useState<boolean>(false);
 
   // Navigation
   const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'attendance' | 'timetable' | 'rooms' | 'gate' | 'notifications' | 'privacy' | 'security' | 'audit' | 'settings'>('dashboard');
@@ -1035,8 +1056,20 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Authentication failed');
+      const text = await res.text();
+      let data: any = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = {};
+      }
+
+      if (!res.ok) {
+        if (res.status === 405 || (!text && window.location.hostname.includes('vercel.app'))) {
+          throw new Error('Backend server is not reachable from this domain. Please click "⚙️ Backend Server" below and select "Use Live Tunnel" or enter your server URL.');
+        }
+        throw new Error(data.detail || `Authentication failed (HTTP ${res.status})`);
+      }
 
       localStorage.setItem('aeris_admin_token', data.token);
       localStorage.setItem('aeris_admin_name', data.name || 'Admin');
@@ -1085,8 +1118,20 @@ export default function App() {
           status: regStatus
         })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Registration failed');
+      const text = await res.text();
+      let data: any = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = {};
+      }
+
+      if (!res.ok) {
+        if (res.status === 405) {
+          throw new Error('Backend server is not reachable from this domain. Please click "⚙️ Backend Server" below.');
+        }
+        throw new Error(data.detail || `Registration failed (HTTP ${res.status})`);
+      }
 
       localStorage.setItem('aeris_admin_token', data.token);
       localStorage.setItem('aeris_admin_name', data.name || regName.trim());
@@ -3254,6 +3299,123 @@ export default function App() {
 
               <div style={{ marginTop: '16px', textAlign: 'center', fontSize: '12px', color: '#64748B' }}>
                 Demo: <code>admin@campusproof.edu</code> / <code>Admin@123</code>
+              </div>
+
+              {/* Backend Connection Switcher */}
+              <div style={{ marginTop: '18px', paddingTop: '14px', borderTop: '1px solid #E2E8F0', textAlign: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowServerConfig(!showServerConfig)}
+                  style={{
+                    background: '#F1F5F9',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: '20px',
+                    padding: '6px 14px',
+                    fontSize: '11px',
+                    color: '#475569',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <span>⚙️ Backend Server:</span>
+                  <span style={{ color: '#0A7B68', fontWeight: '700' }}>
+                    {serverUrl ? serverUrl : (window.location.hostname === 'localhost' ? 'Localhost (Port 8000)' : 'Vercel Auto Proxy')}
+                  </span>
+                </button>
+
+                {showServerConfig && (
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '12px',
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '12px',
+                    border: '1px solid #E2E8F0',
+                    textAlign: 'left'
+                  }}>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>
+                      Backend API URL
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. https://zubxv3c-anonymous-8081.exp.direct or https://your-app.onrender.com"
+                      value={serverUrl}
+                      onChange={(e) => setServerUrl(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        border: '1px solid #CBD5E1',
+                        fontSize: '12px',
+                        marginBottom: '8px',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setApiBaseUrl(serverUrl);
+                          window.location.reload();
+                        }}
+                        style={{
+                          backgroundColor: '#0A7B68',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Save &amp; Connect
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const tunnel = 'https://zubxv3c-anonymous-8081.exp.direct';
+                          setServerUrl(tunnel);
+                          setApiBaseUrl(tunnel);
+                          window.location.reload();
+                        }}
+                        style={{
+                          backgroundColor: '#1E293B',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ⚡ Live Tunnel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setServerUrl('');
+                          setApiBaseUrl('');
+                          window.location.reload();
+                        }}
+                        style={{
+                          backgroundColor: '#E2E8F0',
+                          color: '#475569',
+                          border: 'none',
+                          padding: '6px 10px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Reset Default
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           ) : (

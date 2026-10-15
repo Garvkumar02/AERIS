@@ -5,6 +5,38 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/auth/:path*",
+      "destination": "https://zubxv3c-anonymous-8081.exp.direct/auth/:path*"
+    },
+    {
+      "source": "/attendance/:path*",
+      "destination": "https://zubxv3c-anonymous-8081.exp.direct/attendance/:path*"
+    },
+    {
+      "source": "/biometric/:path*",
+      "destination": "https://zubxv3c-anonymous-8081.exp.direct/biometric/:path*"
+    },
+    {
+      "source": "/devices/:path*",
+      "destination": "https://zubxv3c-anonymous-8081.exp.direct/devices/:path*"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "https://zubxv3c-anonymous-8081.exp.direct/admin/:path*"
+    },
+    {
+      "source": "/registry/:path*",
+      "destination": "https://zubxv3c-anonymous-8081.exp.direct/registry/:path*"
+    },
+    {
+      "source": "/gate/:path*",
+      "destination": "https://zubxv3c-anonymous-8081.exp.direct/gate/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://zubxv3c-anonymous-8081.exp.direct/health"
+    },
+    {
       "source": "/admin-portal/assets/:path*",
       "destination": "/assets/:path*"
     },
