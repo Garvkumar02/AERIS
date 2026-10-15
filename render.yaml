@@ -1,0 +1,59 @@
+services:
+  # ==============================================================================
+  # AERIS FastAPI Python Backend (Render Web Service)
+  # ==============================================================================
+  - type: web
+    name: aeris-backend
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: ENVIRONMENT
+        value: production
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: GEOFENCE_LATITUDE
+        value: "26.8228"
+      - key: GEOFENCE_LONGITUDE
+        value: "75.8648"
+      - key: GEOFENCE_RADIUS_METERS
+        value: "1400"
+      - key: JWT_SECRET
+        generateValue: true
+
+  # ==============================================================================
+  # AERIS React Dashboard (Render Static Site)
+  # ==============================================================================
+  - type: web
+    name: aeris-dashboard
+    runtime: static
+    region: oregon
+    plan: free
+    rootDir: dashboard
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /admin-portal/assets/*
+        destination: /assets/*
+      - type: rewrite
+        source: /admin-portal/campus_overview.jpg
+        destination: /campus_overview.jpg
+      - type: rewrite
+        source: /admin-portal/campus_floor_3d.jpg
+        destination: /campus_floor_3d.jpg
+      - type: rewrite
+        source: /admin-portal/*
+        destination: /index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0

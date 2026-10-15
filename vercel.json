@@ -1,0 +1,44 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd dashboard && npm install && npm run build",
+  "outputDirectory": "dashboard/dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/admin-portal/assets/:path*",
+      "destination": "/assets/:path*"
+    },
+    {
+      "source": "/admin-portal/campus_overview.jpg",
+      "destination": "/campus_overview.jpg"
+    },
+    {
+      "source": "/admin-portal/campus_floor_3d.jpg",
+      "destination": "/campus_floor_3d.jpg"
+    },
+    {
+      "source": "/admin-portal/favicon.svg",
+      "destination": "/favicon.svg"
+    },
+    {
+      "source": "/admin-portal/icons.svg",
+      "destination": "/icons.svg"
+    },
+    {
+      "source": "/admin-portal/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin-portal",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
